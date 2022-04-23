@@ -4,8 +4,6 @@ const { Rental, validate } = require("../models/rental");
 const { Movie } = require("../models/movie");
 const { Customer } = require("../models/customer");
 
-Fawn.init(mongoose);
-
 router.get("/", async (req, res) => {
     const rentals = await Rental.find();
     if (!rentals || rentals.length === 0)
@@ -39,8 +37,9 @@ router.post("/", async (req, res) => {
                 phone: customer.phone,
             },
         });
+
         const result = await rental.save();
-        if(result) {
+        if (result) {
             movie.numberInStock--;
             movie.save();
         }
