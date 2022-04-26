@@ -1,6 +1,9 @@
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const express = require("express");
+const jwt = require('jsonwebtoken');
+const config = require('config');
+
 const router = express.Router();
 const { User, validate } = require("../models/user");
 
@@ -16,7 +19,8 @@ router.post("/", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
         await user.save();
-        res.send(_.pick(user, ["_id", "name", "email"]));
+        const token = jwt.sign(_.pick(user, ['_id', 'name', 'email']), config.get('jwtPrivateKey'));
+        res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
     } catch (ex) {
         console.log(ex);
         res.status(500).send("An error occured while adding new user");
